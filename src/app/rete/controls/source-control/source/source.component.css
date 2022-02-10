@@ -1,0 +1,23 @@
+.container {
+  display: flex;
+}
+button {
+  border: 3px solid #aaaaaa;
+  background-color: black;
+  border-radius: 50%;
+  padding: 12px;
+  cursor: pointer;
+}
+
+hr.connector {
+  display: block;
+  height: 1px;
+  width: 10px;
+  border-top: 3px solid #aaaaaa;
+  margin: auto 0;
+  padding: 0;
+}
+
+.on {
+  background-color: #ff0038;
+}

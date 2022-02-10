@@ -1,1 +1,68 @@
-/* You can add global styles to this file, and also import other style files */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
+}
+
+.connection .main-path {
+  stroke: slategray !important;
+}
+
+.connection .source-true {
+  stroke: #ff0038 !important;
+}
+
+/* .title, */
+/* .output-title { */
+/*   display: none; */
+/* } */
+
+/* .node, */
+/* .selected { */
+/*   /1* display: flex !important; *1/ */
+/*   flex-flow: row-reverse nowrap !important; */
+/*   background: transparent !important; */
+/*   border: none !important; */
+/*   min-width: 0px !important; */
+/*   padding: 0 !important; */
+/* } */
+
+/* .output { */
+/*   align-self: center !important; */
+/*   position: relative !important; */
+/*   z-index: 0 !important; */
+/* } */
+
+/* .node .output-title, */
+/* .node .input-title { */
+/*   vertical-align: baseline !important; */
+/*   margin: 0 !important; */
+/* } */
+
+.socket {
+  width: 13px !important;
+  height: 13px !important;
+  margin: 0 !important;
+  display: block !important;
+  position: relative !important;
+}
+
+.socket.output {
+  margin-bottom: 1px !important;
+}
+
+/* .node, */
+/* .control { */
+/*   align-self: center !important; */
+/*   padding: 0 !important; */
+/* } */

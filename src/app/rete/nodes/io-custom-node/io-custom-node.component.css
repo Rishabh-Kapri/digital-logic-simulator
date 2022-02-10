@@ -1,0 +1,66 @@
+.node,
+.selected {
+  display: flex;
+  flex-flow: row-reverse nowrap;
+  background: transparent;
+  border: none;
+  min-width: 0px;
+  padding: 0;
+}
+
+.output-container {
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+}
+
+.output-container > * {
+  align-self: center;
+}
+
+.input-container {
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: flex-end;
+}
+
+.input-container > * {
+  align-self: center;
+}
+
+.input {
+  margin-bottom: 3px;
+}
+
+.node .output-title,
+.node .input-title {
+  vertical-align: baseline;
+  margin: 0;
+}
+
+.socket {
+  width: 13px;
+  height: 13px;
+  margin: 0;
+  display: block;
+}
+
+.socket {
+  margin: 0;
+}
+
+.socket.output {
+  position: relative;
+  margin-left: -9px;
+  margin-bottom: 2px;
+}
+
+.node,
+.control {
+  align-self: center;
+  padding: 0;
+}
+
+rete-socket {
+  margin-top: 6px;
+}
