@@ -17,29 +17,35 @@ export class OrGateComponent extends Component implements AngularComponent {
   }
 
   async builder(node: Node): Promise<void> {
-    const out = new Output('output', '', ioSocket);
-    const inputA = new Input('inputA', '', ioSocket);
-    const inputB = new Input('inputB', '', ioSocket);
+    const out = new Output('data_output', '', ioSocket);
+    const inputA = new Input('data_input_0', '', ioSocket);
+    const inputB = new Input('data_input_1', '', ioSocket);
 
-    inputA.addControl(new SourceControl(this.editor, 'inputA'));
-    inputB.addControl(new SourceControl(this.editor, 'inputB'));
+    inputA.addControl(new SourceControl(this.editor, 'data_input_0'));
+    inputB.addControl(new SourceControl(this.editor, 'data_input_1'));
 
     node.addInput(inputA).addInput(inputB).addControl(new OrGateControl(this.editor, this.key)).addOutput(out);
   }
 
-  async worker(node: NodeData, inputs: WorkerInputs, outputs: WorkerOutputs) {
-    const inputA = (inputs['inputA'].length ? inputs['inputA'][0] : node.data['inputA']) as boolean;
-    const inputB = (inputs['inputB'].length ? inputs['inputB'][0] : node.data['inputB']) as boolean;
+  async worker(node: NodeData, inputs: WorkerInputs, outputs: WorkerOutputs, args: any) {
+    const inputA = (inputs['data_input_0'].length ? inputs['data_input_0'][0] : false) as boolean;
+    const inputB = (inputs['data_input_1'].length ? inputs['data_input_1'][0] : false) as boolean;
+
     const output = inputA || inputB;
-    const ctrl = <OrGateControl>this.editor?.nodes.find((n) => n.id === node.id)?.controls.get(this.key);
+
     const currNode = <Node>this.editor?.nodes.find((n) => n.id === node.id);
+    const ctrl = <OrGateControl>currNode?.controls.get(this.key);
 
-    ctrl.setOrValue(output);
-    outputs['output'] = output;
-    currNode.meta = { output }; // set value of output in meta object of the node for later access
-
-    const nodeConnections = currNode.getConnections() ?? [];
-    const connections = this.editor?.view.connections;
-    this._rete.updateConnectionStroke(connections, nodeConnections);
+    outputs['data_output'] = output;
+    if (!args?.['isInternal']) {
+      // only write to control when it is an external gate
+      if (currNode) {
+        ctrl.setOrValue(output);
+        currNode.meta = { output }; // set value of output in meta object of the node for later access
+        const nodeConnections = currNode.getConnections() ?? [];
+        const connections = this.editor?.view.connections;
+        this._rete.updateConnectionStroke(connections, nodeConnections);
+      }
+    }
   }
 }

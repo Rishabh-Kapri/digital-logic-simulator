@@ -17,10 +17,10 @@ export class NotGateComponent extends Component implements AngularComponent {
   }
 
   async builder(node: Node): Promise<void> {
-    const output = new Output('output', '', ioSocket);
-    const input = new Input('input', '', ioSocket);
+    const output = new Output('data_output', '', ioSocket);
+    const input = new Input('data_input_0', '', ioSocket);
 
-    input.addControl(new SourceControl(this.editor, 'input'));
+    input.addControl(new SourceControl(this.editor, 'data_input_0'));
 
     node
       .addInput(input)
@@ -28,21 +28,26 @@ export class NotGateComponent extends Component implements AngularComponent {
       .addOutput(output);
   }
 
-  async worker(node: NodeData, inputs: WorkerInputs, outputs: WorkerOutputs, args: any) {
-    console.log('Not Gate Component:', node, 'inputs:', inputs, 'outputs:', outputs, 'args:', args);
+  async worker(node: NodeData, inputs: WorkerInputs, outputs: WorkerOutputs, args: any): Promise<void> {
     const key = `${this.key}-${node.data['id']}`;
-    const input = (inputs['input'].length ? inputs['input'][0] : node.data[key]) as boolean;
+    // console.log('NOT   :', key, node.data, inputs['data_input_0'], outputs['data_output'], args);
+    const input = (inputs['data_input_0'].length ? inputs['data_input_0'][0] : false) as boolean;
+
     const output = !input;
+
     const currNode = <Node>this.editor?.nodes.find((n) => n.id === node.id);
     const ctrl = <NotGateControl>currNode?.controls.get(key);
 
-    outputs['output'] = output;
-    if (currNode) {
-      ctrl.setNotValue(output);
-      currNode.meta = { output }; // set value of output in meta object of node for later access
-      const nodeConnections = currNode.getConnections() ?? [];
-      const connections = this.editor?.view.connections;
-      this._rete.updateConnectionStroke(connections, nodeConnections);
+    outputs['data_output'] = output;
+    if (!args?.['isInternal']) {
+      // only write to control when it is an external gate
+      if (currNode) {
+        ctrl.setNotValue(output);
+        currNode.meta = { output }; // set value of output in meta object of node for later access
+        const nodeConnections = currNode.getConnections() ?? [];
+        const connections = this.editor?.view.connections;
+        this._rete.updateConnectionStroke(connections, nodeConnections);
+      }
     }
   }
 }
