@@ -9,6 +9,8 @@ import { GateCustomNodeComponent } from './nodes/gate-custom-node/node.component
 import { SinkComponent } from './controls/sink-control/sink/sink.component';
 import { OrGateComponent } from './controls/or-gate-control/or-gate/or-gate.component';
 import { IOCustomNodeComponent } from './nodes/io-custom-node/io-custom-node.component';
+import { CircuitModuleCustomNodeComponent } from './nodes/circuit-module-custom-node/circuit-module-custom-node.component';
+import { CustomCircuitComponent } from './controls/custom-circuit-control/custom-circuit/custom-circuit.component';
 
 @NgModule({
   declarations: [
@@ -20,6 +22,8 @@ import { IOCustomNodeComponent } from './nodes/io-custom-node/io-custom-node.com
     IOCustomNodeComponent,
     SinkComponent,
     OrGateComponent,
+    CircuitModuleCustomNodeComponent,
+    CustomCircuitComponent,
   ],
   imports: [CommonModule, ReteModule],
   exports: [ReteComponent, ReteModule],
@@ -30,6 +34,8 @@ import { IOCustomNodeComponent } from './nodes/io-custom-node/io-custom-node.com
     IOCustomNodeComponent,
     SinkComponent,
     OrGateComponent,
+    CircuitModuleCustomNodeComponent,
+    CustomCircuitComponent,
   ],
 })
 export class ReteEditorModule {}
