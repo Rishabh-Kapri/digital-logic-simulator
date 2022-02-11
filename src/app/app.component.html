@@ -1,10 +1,7 @@
 <div class="root-container">
   <mat-drawer-container class="container" hasBackdrop="false">
     <mat-drawer class="sidenav" mode="push" opened>
-      <div #gatesEle class="gate-container" *ngFor="let gate of gates; let i = index">
-        <div class="gate-name">{{gate.name}}</div>
-        <img class="gate-icon" [src]="gate.icon" />
-      </div>
+      <app-sidebar></app-sidebar>
     </mat-drawer>
     <mat-drawer-content class="main-content">
       <app-rete></app-rete>

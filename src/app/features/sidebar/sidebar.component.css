@@ -1,0 +1,24 @@
+.gate-container {
+  /* border-radius: 4px; */
+  /* padding: 5px; */
+  display: flex;
+  min-width: 100px;
+  /* justify-content: space-between; */
+  /* cursor: pointer; */
+  margin-bottom: 10px;
+  /* background-color: #3f3f3f; */
+}
+
+.gate-container > * {
+  align-self: center;
+}
+
+.gate-icon {
+  height: 30px;
+  width: 30px;
+}
+
+.gate-name {
+  font-size: 1rem;
+  margin-right: 10px;
+}

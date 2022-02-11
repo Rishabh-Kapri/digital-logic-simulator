@@ -7,6 +7,7 @@ import { SharedModule } from './shared/shared.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FeaturesModule } from './features/features.module';
 import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { ReteEditorModule } from './rete/rete.module';
@@ -22,6 +23,7 @@ import { ReteEditorModule } from './rete/rete.module';
     MatSidenavModule,
     MatCardModule,
     DragDropModule,
+    MatButtonModule,
     ReteEditorModule,
   ],
   providers: [],

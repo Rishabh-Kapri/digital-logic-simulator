@@ -1,1 +1,11 @@
-
+<button
+  mat-stroked-button
+  #gatesEle
+  class="gate-container"
+  *ngFor="let gate of
+  gates; let i = index"
+  (click)="addToUI(gate.name)"
+>
+  <div class="gate-name">{{gate.name}}</div>
+  <img class="gate-icon" [src]="gate.icon" />
+</button>
