@@ -1,39 +1,33 @@
 .node {
-  background: rgba(70, 36, 155, 0.8);
-  border: 2px solid #4e58bf;
-  border-radius: 10px;
+  display: flex;
+  flex-flow: row-reverse;
+  border: 2px solid #202020;
+  background: #3a4f4c;
+  border-radius: 8px;
   cursor: pointer;
-  min-width: 180px;
-  height: auto;
-  padding-bottom: 6px;
-  box-sizing: content-box;
   position: relative;
   user-select: none;
+  padding: 15px 5px;
 }
 
 .node:hover {
-  background: rgba(77, 40, 172, 0.8);
+  background: rgba(58, 79, 76, 0.7);
 }
 
 .node.selected {
-  background: #ffd92c;
-  border-color: #e3c000;
 }
 
-.node .title {
-  color: white;
-  font-family: sans-serif;
-  font-size: 18px;
-  padding: 8px;
+.node > * {
+  align-self: center;
 }
 
-.node .output {
-  text-align: right;
-}
+/* .node .output { */
+/*   text-align: right; */
+/* } */
 
-.node .input {
-  text-align: left;
-}
+/* .node .input { */
+/*   text-align: left; */
+/* } */
 
 .node .input-title,
 .node .output-title {
@@ -60,4 +54,12 @@
 
 .node .control {
   padding: 6px 18px;
+}
+
+.output-container {
+  margin-right: -12px;
+}
+
+.input-container {
+  margin-left: -12px;
 }

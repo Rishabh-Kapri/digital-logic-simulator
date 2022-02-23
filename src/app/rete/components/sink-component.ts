@@ -1,8 +1,8 @@
+import { Store } from '@ngxs/store';
 import { Component, Input, Node } from 'rete';
 import { AngularComponent, AngularComponentData } from 'rete-angular-render-plugin';
 import { NodeData, WorkerInputs, WorkerOutputs } from 'rete/types/core/data';
-import { CircuitModuleManagerService } from 'src/app/core/circuit-module-manager.service';
-import { ReteService } from 'src/app/core/rete.service';
+import { CircuitModuleActions } from 'src/app/core/store/actions/circuit.actions';
 import { SinkControl } from '../controls/sink-control/sink.control';
 import { IOCustomNodeComponent } from '../nodes/io-custom-node/io-custom-node.component';
 import { ioSocket } from '../sockets/sockets';
@@ -10,7 +10,7 @@ import { ioSocket } from '../sockets/sockets';
 export class SinkComponent extends Component implements AngularComponent {
   override data!: AngularComponentData;
   key = 'Sink';
-  constructor(public _rete: ReteService, private _manager: CircuitModuleManagerService) {
+  constructor(private store: Store) {
     super('Sink');
     this.data.render = 'angular';
     this.data.component = IOCustomNodeComponent;
@@ -24,9 +24,7 @@ export class SinkComponent extends Component implements AngularComponent {
   }
 
   async worker(node: NodeData, inputs: WorkerInputs, _: WorkerOutputs, args: any) {
-    // console.log('SINK  :', node, inputs['data_input_0'], args);
     const key = `${this.key}-${node.data['id']}`;
-    const currNode = <Node>this.editor?.nodes.find((n) => n.id === node.id);
     if (args?.['isInternal'] && args?.['circuitName']) {
       // Internal sink is triggered
       // when isInternal is true the this is used as output for the circuit module
@@ -34,11 +32,13 @@ export class SinkComponent extends Component implements AngularComponent {
       // the name-id of the sink as the key which is retrieved from NodesData
       // data_input_0 is harcoded because sink only has 1 input
       //
-      // Received by inputs of internal sink, then is converted to outputs of
-      // circuit module
-      this._manager.setOutputValue(<string>args['circuitName'], key, <boolean>inputs['data_input_0'][0]);
+      // Received by inputs of internal sink, then is converted to outputs of circuit module
+      const circuitName = <string>args['circuitName'];
+      const outputValue = <boolean>inputs['data_input_0'][0];
+      this.store.dispatch(new CircuitModuleActions.SetOutputByKey(circuitName, key, outputValue));
     } else {
       // External sink is triggered
+      const currNode = <Node>this.editor?.nodes.find((n) => n.id === node.id);
       const input = <boolean>(inputs['data_input_0'].length ? inputs['data_input_0'][0] : false);
       if (currNode) {
         const ctrl = <SinkControl>currNode?.controls.get(key);

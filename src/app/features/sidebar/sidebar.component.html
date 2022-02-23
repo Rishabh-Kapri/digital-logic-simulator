@@ -2,10 +2,20 @@
   mat-stroked-button
   #gatesEle
   class="gate-container"
-  *ngFor="let gate of
-  gates; let i = index"
-  (click)="addToUI(gate.name)"
+  *ngFor="let item of gatesDefault | keyvalue; let i = index"
+  (click)="addToUI(item.key, item.value.type)"
 >
-  <div class="gate-name">{{gate.name}}</div>
-  <img class="gate-icon" [src]="gate.icon" />
+  <div class="gate-name">{{item.key}}</div>
+  <img class="gate-icon" [src]="item.value.icon" />
+</button>
+<hr class="separator" />
+<button
+  mat-stroked-button
+  #gatesEle
+  class="gate-container"
+  *ngFor="let item of gatesCustom | keyvalue; let i = index"
+  (click)="addToUI(item.key, item.value.type)"
+>
+  <div class="gate-name">{{item.key}}</div>
+  <img class="gate-icon" [src]="item.value.icon" />
 </button>

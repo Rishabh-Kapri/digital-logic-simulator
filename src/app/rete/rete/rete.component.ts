@@ -1,10 +1,9 @@
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
-import { Node } from 'rete';
 import { ReteService } from 'src/app/core/rete.service';
 import { Data } from 'rete/types/core/data';
-import { testData } from 'src/app/shared/test-data';
-import { CircuitModuleManagerService } from 'src/app/core/circuit-module-manager.service';
-// import { zoomAt } from 'rete-area-plugin';
+import { MatDialog } from '@angular/material/dialog';
+import { DialogComponent } from 'src/app/shared/components/dialog/dialog.component';
+import { Store } from '@ngxs/store';
 
 @Component({
   selector: 'app-rete',
@@ -16,7 +15,7 @@ export class ReteComponent implements AfterViewInit {
   data!: Data;
   modules = {};
 
-  constructor(public _rete: ReteService, private _manager: CircuitModuleManagerService) {}
+  constructor(public _rete: ReteService, public dialog: MatDialog) {}
 
   async ngAfterViewInit() {
     const container = this.el.nativeElement;
@@ -26,9 +25,23 @@ export class ReteComponent implements AfterViewInit {
   }
 
   async packageCurrent() {
+    console.log(this._rete.editorState);
+    if (this._rete.editorState.empty) {
+      // await this._rete.packageCircuit();
+      return;
+    }
+    // @TODO
+    // show dialog to add name
     try {
-      const emptyData = { id: 'node-editor@0.1.0', nodes: {} };
-      await this._rete.packageCircuit();
+      const dialogRef = this.dialog.open(DialogComponent, {
+        width: '250px',
+        data: { title: 'Enter circuit name', showInput: true, circuitName: '' },
+      });
+      dialogRef.afterClosed().subscribe(async (result) => {
+        if (result) {
+          await this._rete.packageCircuitFromEditor(<string>result);
+        }
+      });
     } catch (err) {
       console.log(`${err}`);
     }

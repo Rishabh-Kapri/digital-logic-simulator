@@ -1,13 +1,13 @@
 <div class="root-container">
-  <mat-drawer-container class="container" hasBackdrop="false">
+  <mat-drawer-container class="container" hasBackdrop="false" autosize>
     <mat-drawer class="sidenav" mode="push" opened>
       <app-sidebar></app-sidebar>
     </mat-drawer>
-    <mat-drawer-content class="main-content">
+    <div class="main-content">
       <app-rete></app-rete>
       <!-- <canvas #canvas resize></canvas> -->
       <router-outlet></router-outlet>
-    </mat-drawer-content>
+    </div>
   </mat-drawer-container>
 </div>
 <!-- <div class="input-1">INPUT-1</div> -->

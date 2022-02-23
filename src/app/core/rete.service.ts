@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 import { nanoid } from 'nanoid';
-import { Connection, Engine, Input, Node, NodeEditor, Output } from 'rete';
-import { Data, NodesData } from 'rete/types/core/data';
-import { ConnectionView } from 'rete/types/view/connection';
+import { Engine, Input, Node, NodeEditor, Output } from 'rete';
+import { Data } from 'rete/types/core/data';
 import { AndGateComponent } from '../rete/components/and-gate-component';
 import { CircuitModuleComponent } from '../rete/components/circuit-module-component';
 import { NotGateComponent } from '../rete/components/not-gate-component';
@@ -12,13 +11,20 @@ import { SourceComponent } from '../rete/components/source-component';
 import { ioSocket } from '../rete/sockets/sockets';
 import ConnectionPlugin from 'rete-connection-plugin';
 import { AngularRenderPlugin } from 'rete-angular-render-plugin';
-import { CircuitModuleManagerService } from './circuit-module-manager.service';
-import { testData } from '../shared/test-data';
+// @ts-ignore
+import AreaPlugin from 'rete-area-plugin';
+// @ts-ignore
+import ContextMenuPlugin from 'rete-context-menu-plugin';
+import { Store } from '@ngxs/store';
+import { CircuitModuleActions } from './store/actions/circuit.actions';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ReteService {
+  editorState = {
+    empty: true,
+  };
   andGateComponent!: AndGateComponent;
   notGateComponent!: NotGateComponent;
   orGateComponent!: OrGateComponent;
@@ -29,21 +35,26 @@ export class ReteService {
   editor!: NodeEditor;
   engine!: Engine;
 
-  constructor(private _manager: CircuitModuleManagerService) {}
+  constructor(private store: Store) {}
 
   initRete(container: HTMLElement): void {
+    console.log(this.store);
     this.editor = new NodeEditor('node-editor@0.1.0', container);
     this.engine = new Engine('node-editor@0.1.0');
 
     this.editor.use(ConnectionPlugin);
     this.editor.use(AngularRenderPlugin);
+    this.setContextMenuPlugin();
+    this.editor.use(AreaPlugin, {
+      // translateExtent: { width: 100, height: 100 },
+    });
 
-    this.andGateComponent = new AndGateComponent(this);
-    this.notGateComponent = new NotGateComponent(this);
-    this.orGateComponent = new OrGateComponent(this);
-    this.sourceComponent = new SourceComponent(this, this._manager);
-    this.sinkComponent = new SinkComponent(this, this._manager);
-    this.customCircuitComponent = new CircuitModuleComponent(this, this._manager);
+    this.andGateComponent = new AndGateComponent(this.store);
+    this.notGateComponent = new NotGateComponent(this.store);
+    this.orGateComponent = new OrGateComponent(this.store);
+    this.sourceComponent = new SourceComponent(this.store);
+    this.sinkComponent = new SinkComponent(this.store);
+    this.customCircuitComponent = new CircuitModuleComponent(this.store);
 
     [
       this.andGateComponent,
@@ -56,10 +67,57 @@ export class ReteService {
       this.editor.register(c);
       this.engine.register(c);
     });
-    this._manager.engine = this.engine;
     this.addReteListeners();
     this.editor.view.resize();
+    const { area } = this.editor.view;
+    console.log(area);
     this.editor.trigger('process');
+  }
+
+  setContextMenuPlugin() {
+    this.editor.use(ContextMenuPlugin, {
+      searchBar: false, // true by default
+      // searchKeep: title => true, // leave item when searching, optional. For example, title => ['Refresh'].includes(title)
+      delay: 100,
+      allocate(component: any) {
+        if (component.name !== 'Custom') {
+          return [];
+        } else {
+          return null;
+        }
+      },
+      rename(component: any) {
+        if (component.name === 'Source') {
+          return 'Input';
+        } else if (component.name === 'Sink') {
+          return 'Output';
+        } else {
+          return component.name;
+        }
+      },
+      items: {
+        'Click me'() {
+          console.log('Works!');
+        },
+      },
+      nodeItems: {
+        'Click me'(component: any) {
+          console.log(component.node.id, component.node);
+        },
+        Delete: true, // don't show Delete item
+        Clone: false, // or Clone item
+      },
+      // OR
+      // nodeItems: (node: any) => {
+      //   if (node.name === 'Add') {
+      //     return {
+      //       'Only for Add nodes'() => { console.log('Works for add node!') },
+      //   };
+      // }
+      //   return {
+      //   'Click me'() { console.log('Works for node!') }
+      // }
+    });
   }
 
   addReteListeners(): void {
@@ -72,8 +130,14 @@ export class ReteService {
       if (this.editor.silent) {
         return;
       }
+      const editorData = this.editor.toJSON();
+      if (Object.keys(editorData.nodes).length === 0) {
+        this.editorState.empty = true;
+      } else {
+        this.editorState.empty = false;
+      }
       await this.engine.abort();
-      await this.engine.process(this.editor.toJSON());
+      await this.engine.process(editorData);
     }) as any);
 
     this.engine.on('error', (err) => {
@@ -112,91 +176,72 @@ export class ReteService {
   }
 
   async addCircuitModuleOnUI(circuitName: string) {
-    const node = await this.customCircuitComponent.createNode({ circuitName });
+    const node = await this.customCircuitComponent.createNode({ circuitName, shownInEditor: true });
     this.editor.addNode(node);
     return node;
   }
 
-  updateConnectionStroke(connections: Map<Connection, ConnectionView> | undefined, nodeConnections: Connection[]) {
-    if (connections) {
-      for (let con of nodeConnections) {
-        const conData = connections?.get(con);
-        if (conData) {
-          const { el } = conData;
-          const path = el.querySelector('path');
-          const output = conData.outputNode.node.meta['output'] ?? false;
-          if (output) {
-            path?.classList.add('source-true');
-          } else {
-            path?.classList.remove('source-true');
-          }
-        }
-      }
-    }
-  }
-
-  async packageCircuit() {
-    await this.addSourceOnUI();
-    await this.addSourceOnUI();
-    await this.addSinkOnUI();
+  async packageCircuitFromEditor(circuitName: string = 'NAND') {
     try {
-      const circuitName = 'AND_CUSTOM';
-      const nodesData = <NodesData>testData[circuitName];
-      this._manager.init(circuitName, {
-        id: 'node-editor@0.1.0',
-        nodes: nodesData,
-      });
-      const circuitNode = <Node>await this.addCircuitModuleOnUI(circuitName);
+      const data = this.editor.toJSON();
+      // const data = { id: 'node-editor@0.1.0', nodes: testData[circuitName] };
+      if (Object.keys(data.nodes).length !== 0) {
+        const emptyData = { id: 'node-editor@0.1.0', nodes: {} };
+        // reset the editor to blank state
+        await this.editor.fromJSON(emptyData);
 
-      for (let [id, nodeData] of Object.entries(nodesData)) {
-        const nodeType = nodeData.name;
-        switch (nodeType) {
-          case 'Source': {
-            // store this key
-            const key = `${nodeData.name}-${nodeData.data['id']}`;
-            circuitNode.addInput(new Input(key, '', ioSocket));
-            console.log('Source node found', key);
-            break;
-          }
-          case 'Sink': {
-            const key = `${nodeData.name}-${nodeData.data['id']}`;
-            circuitNode.addOutput(new Output(key, '', ioSocket));
-            console.log('Sink node found', key);
-            break;
-          }
-          case 'Custom': {
-            console.log('Custom node found');
-            const name = <string>nodeData.data['circuitName'];
-            console.log(testData[name]);
-            if (testData[name]) {
-              this._manager.init(name, {
-                id: 'node-editor@0.1.0',
-                nodes: testData[name],
-              });
-            }
-            break;
-          }
-        }
-        console.log('ID: ', `${nodeData.name}-${nodeData.data['id']}`);
-        for (let [inputKey, input] of Object.entries(nodeData.inputs)) {
-          console.log('INPUTS:', inputKey, input.connections);
-          for (let con of input.connections) {
-            console.log('Input Con:', inputKey, con);
-          }
-        }
-        for (let [outputKey, output] of Object.entries(nodeData.outputs)) {
-          console.log('OUTPUTS:', outputKey, output.connections);
-          for (let con of output.connections) {
-            console.log('Output Con:', outputKey, con);
-          }
-        }
-        console.log('\n');
+        // @TODO
+        // add check here for existing name
+        this.store.dispatch(new CircuitModuleActions.Init(circuitName, data));
+        await this.addCircuit(circuitName, data);
       }
-
-      console.log(this._manager);
-      this.editor.trigger('process');
     } catch (err) {
       console.log(err);
     }
+  }
+
+  async addExistingCustomCircuit(circuitName: string) {
+    // @TODO
+    // handle circuit not present
+    const data = <Data>this.store.selectSnapshot((state) => state.circuit[circuitName].data);
+    await this.addCircuit(circuitName, data);
+  }
+
+  private async addCircuit(circuitName: string, data: Data) {
+    const circuitNode = <Node>await this.addCircuitModuleOnUI(circuitName);
+    const nodesData = data.nodes;
+
+    const customCircuits = [];
+    for (let [id, nodeData] of Object.entries(nodesData)) {
+      const nodeType = nodeData.name;
+      switch (nodeType) {
+        case 'Source': {
+          const key = `${nodeData.name}-${nodeData.data['id']}`;
+          console.log('Source:', key);
+          circuitNode.addInput(new Input(key, key, ioSocket));
+          break;
+        }
+        case 'Sink': {
+          const key = `${nodeData.name}-${nodeData.data['id']}`;
+          console.log('Sink:', key);
+          circuitNode.addOutput(new Output(key, key, ioSocket));
+          break;
+        }
+        case 'Custom': {
+          // since all the custom circuit data is parsed from localStorage by
+          // ngxs we don't need to init anything here. We just need to check if
+          // the data is not present in state
+          // @TODO
+          // 1. add comments
+          // 2. handle custom circuit not present
+          console.log('Custom node found');
+          const name = <string>nodeData.data['circuitName'];
+          customCircuits.push(name);
+          break;
+        }
+      }
+    }
+    console.log(customCircuits);
+    this.editor.trigger('process');
   }
 }

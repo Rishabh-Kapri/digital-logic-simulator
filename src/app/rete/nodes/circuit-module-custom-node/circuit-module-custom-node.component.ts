@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { NodeComponent, NodeService } from 'rete-angular-render-plugin';
 
 @Component({
@@ -8,8 +8,12 @@ import { NodeComponent, NodeService } from 'rete-angular-render-plugin';
   providers: [NodeService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CircuitModuleCustomNodeComponent extends NodeComponent {
+export class CircuitModuleCustomNodeComponent extends NodeComponent implements AfterViewInit {
   constructor(service: NodeService, cdr: ChangeDetectorRef) {
     super(service, cdr);
+  }
+
+  ngAfterViewInit() {
+    console.log(this.node.outputs);
   }
 }

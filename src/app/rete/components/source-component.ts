@@ -1,8 +1,8 @@
-import { Component, Input, Node, Output } from 'rete';
+import { Store } from '@ngxs/store';
+import { Component, Node, Output } from 'rete';
 import { AngularComponent, AngularComponentData } from 'rete-angular-render-plugin';
 import { NodeData, WorkerInputs, WorkerOutputs } from 'rete/types/core/data';
-import { CircuitModuleManagerService } from 'src/app/core/circuit-module-manager.service';
-import { ReteService } from 'src/app/core/rete.service';
+import { AppActions } from 'src/app/core/store/actions/app.actions';
 import { SourceControl } from '../controls/source-control/source.control';
 import { IOCustomNodeComponent } from '../nodes/io-custom-node/io-custom-node.component';
 import { ioSocket } from '../sockets/sockets';
@@ -10,7 +10,7 @@ import { ioSocket } from '../sockets/sockets';
 export class SourceComponent extends Component implements AngularComponent {
   override data!: AngularComponentData;
   key = 'Source';
-  constructor(private _rete: ReteService, private _manager: CircuitModuleManagerService) {
+  constructor(private store: Store) {
     super('Source');
     this.data.render = 'angular';
     this.data.component = IOCustomNodeComponent;
@@ -23,9 +23,7 @@ export class SourceComponent extends Component implements AngularComponent {
   }
 
   async worker(node: NodeData, _: WorkerInputs, outputs: WorkerOutputs, args: any) {
-    // console.log('SOURCE:', node, outputs['data_output'], args);
     const key = `${this.key}-${node.data['id']}`;
-    const currNode = <Node>this.editor?.nodes.find((n) => n.id === node.id);
 
     if (args?.['isInternal'] && args?.['circuitName']) {
       // Internal source is triggered
@@ -47,16 +45,19 @@ export class SourceComponent extends Component implements AngularComponent {
       // source-0 ----> cm-source-0 ---> outputs of cm-source-0 --> passed to interval gates
       //                              |
       //                              |
-      outputs['data_output'] = this._manager.getInputValue(<string>args?.['circuitName'], key);
+      const circuitName = <string>args?.['circuitName'];
+      outputs['data_output'] =
+        <boolean>this.store.selectSnapshot((state) => state.circuit[circuitName]?.inputValues[key]?.[0]) ?? false;
     } else {
       // External source is triggered
+      const currNode = <Node>this.editor?.nodes.find((n) => n.id === node.id);
       const output = node.data[key];
       outputs['data_output'] = output;
       if (currNode) {
         currNode.meta = { output }; // set value of output in meta object of node for later access
         const connections = this.editor?.view.connections;
         const nodeConnections = currNode?.getConnections() ?? [];
-        this._rete.updateConnectionStroke(connections, nodeConnections);
+        this.store.dispatch(new AppActions.UpdateConnectionStroke(connections, nodeConnections));
       }
     }
   }

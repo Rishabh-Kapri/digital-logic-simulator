@@ -11,6 +11,7 @@ import { OrGateComponent } from './controls/or-gate-control/or-gate/or-gate.comp
 import { IOCustomNodeComponent } from './nodes/io-custom-node/io-custom-node.component';
 import { CircuitModuleCustomNodeComponent } from './nodes/circuit-module-custom-node/circuit-module-custom-node.component';
 import { CustomCircuitComponent } from './controls/custom-circuit-control/custom-circuit/custom-circuit.component';
+import { MatDialogModule } from '@angular/material/dialog';
 
 @NgModule({
   declarations: [
@@ -25,7 +26,7 @@ import { CustomCircuitComponent } from './controls/custom-circuit-control/custom
     CircuitModuleCustomNodeComponent,
     CustomCircuitComponent,
   ],
-  imports: [CommonModule, ReteModule],
+  imports: [CommonModule, ReteModule, MatDialogModule],
   exports: [ReteComponent, ReteModule],
   entryComponents: [
     AndGateComponent,

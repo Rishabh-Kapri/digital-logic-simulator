@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="95" height="64" viewBox="0 0 95 64" fill="none">
+  <path
+    fill-rule="evenodd"
+    clip-rule="evenodd"
+    d="M12.9953 62C12.9442 62.0021 28.3053 59.1852 28.3053 32C28.3053 4.54716 12.9942 1.99987 12.9953 2C37.7279 4.74979 53.8356 0.855541 70.8575 32C58.1652 59.5379 41.5196 60.845 12.9953 62Z"
+    stroke="#AAAAAA"
+    stroke-width="4"
+    stroke-linejoin="round"
+  />
+  <line x1="25.9587" y1="19.7924" x2="0.962206" y2="19.7924" stroke="#AAAAAA" stroke-width="4" />
+  <line x1="25.9563" y1="45.6794" x2="0.959776" y2="45.6794" stroke="#AAAAAA" stroke-width="4" />
+  <line y1="-2" x2="22" y2="-2" transform="matrix(-1 0 -0.000412792 -1 94 30.6306)" stroke="#AAAAAA" stroke-width="4" />
+</svg>
