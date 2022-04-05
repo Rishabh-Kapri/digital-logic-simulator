@@ -88,4 +88,12 @@ export class CircuitModuleState {
       await engine.process(state[circuitName].data, null, { ...args });
     }
   }
+
+  @Action(CircuitModuleActions.DeleteCircuit)
+  deleteCircuit(ctx: StateContext<CircuitState>, action: CircuitModuleActions.DeleteCircuit) {
+    const state = ctx.getState();
+    console.log(state, action.circuitName);
+    delete state[action.circuitName];
+    ctx.setState(state);
+  }
 }

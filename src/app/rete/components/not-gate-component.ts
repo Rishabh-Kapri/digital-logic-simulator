@@ -35,15 +35,14 @@ export class NotGateComponent extends Component implements AngularComponent {
 
     const output = !input;
 
-    const currNode = <Node>this.editor?.nodes.find((n) => n.id === node.id);
-    const ctrl = <NotGateControl>currNode?.controls.get(key);
-
     outputs['data_output'] = output;
     if (!args?.['isInternal']) {
       // only write to control when it is an external gate
+      const currNode = <Node>this.editor?.nodes.find((n) => n.id === node.id);
+      const ctrl = <NotGateControl>currNode?.controls.get(key);
       if (currNode) {
         ctrl.setNotValue(output);
-        currNode.meta = { output }; // set value of output in meta object of node for later access
+        currNode.meta = { data_output: output }; // set value of output in meta object of node for later access
         const nodeConnections = currNode.getConnections() ?? [];
         const connections = this.editor?.view.connections;
         this.store.dispatch(new AppActions.UpdateConnectionStroke(connections, nodeConnections));

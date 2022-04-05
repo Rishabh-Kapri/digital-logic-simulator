@@ -39,15 +39,14 @@ export class AndGateComponent extends Component implements AngularComponent {
 
     const output = inputA && inputB;
 
-    const currNode = <Node>this.editor?.nodes.find((n) => n.id === node.id);
-    const ctrl = <AndGateControl>currNode?.controls.get(key);
-
     outputs['data_output'] = output;
     if (!args?.['isInternal']) {
+      const currNode = <Node>this.editor?.nodes.find((n) => n.id === node.id);
+      const ctrl = <AndGateControl>currNode?.controls.get(key);
       // only write to control when it is an external gate
       if (currNode) {
         ctrl.setAndValue(output);
-        currNode.meta = { output }; // set value of output in meta object of the node for later access
+        currNode.meta = { data_output: output }; // set value of output in meta object of the node for later access
         const nodeConnections = currNode.getConnections() ?? [];
         const connections = this.editor?.view.connections;
         this.store.dispatch(new AppActions.UpdateConnectionStroke(connections, nodeConnections));

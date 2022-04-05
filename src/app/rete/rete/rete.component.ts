@@ -20,7 +20,6 @@ export class ReteComponent implements AfterViewInit {
   async ngAfterViewInit() {
     const container = this.el.nativeElement;
     this._rete.initRete(container);
-
     // zoomAt(editor);
   }
 

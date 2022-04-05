@@ -55,7 +55,7 @@ export class SidebarComponent implements OnInit {
       .pipe(
         filter((val) => !!val),
         map((val) => {
-          const arr = Object.entries(val).map(([key, value]) => {
+          const arr = Object.entries(val).map(([key, _]) => {
             return { name: key };
           });
           return arr;

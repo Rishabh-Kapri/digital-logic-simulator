@@ -25,6 +25,7 @@ export class SinkComponent extends Component implements AngularComponent {
 
   async worker(node: NodeData, inputs: WorkerInputs, _: WorkerOutputs, args: any) {
     const key = `${this.key}-${node.data['id']}`;
+
     if (args?.['isInternal'] && args?.['circuitName']) {
       // Internal sink is triggered
       // when isInternal is true the this is used as output for the circuit module

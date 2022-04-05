@@ -21,4 +21,9 @@ export namespace CircuitModuleActions {
     static readonly type = '[CM] Process Data';
     constructor(public circuitName: string) {}
   }
+
+  export class DeleteCircuit {
+    static readonly type = '[CM] Delete';
+    constructor(public circuitName: string) {}
+  }
 }

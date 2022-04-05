@@ -34,15 +34,14 @@ export class OrGateComponent extends Component implements AngularComponent {
 
     const output = inputA || inputB;
 
-    const currNode = <Node>this.editor?.nodes.find((n) => n.id === node.id);
-    const ctrl = <OrGateControl>currNode?.controls.get(this.key);
-
     outputs['data_output'] = output;
     if (!args?.['isInternal']) {
       // only write to control when it is an external gate
+      const currNode = <Node>this.editor?.nodes.find((n) => n.id === node.id);
+      const ctrl = <OrGateControl>currNode?.controls.get(this.key);
       if (currNode) {
         ctrl.setOrValue(output);
-        currNode.meta = { output }; // set value of output in meta object of the node for later access
+        currNode.meta = { data_output: output }; // set value of output in meta object of the node for later access
         const nodeConnections = currNode.getConnections() ?? [];
         const connections = this.editor?.view.connections;
         this.store.dispatch(new AppActions.UpdateConnectionStroke(connections, nodeConnections));

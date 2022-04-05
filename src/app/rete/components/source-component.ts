@@ -54,7 +54,7 @@ export class SourceComponent extends Component implements AngularComponent {
       const output = node.data[key];
       outputs['data_output'] = output;
       if (currNode) {
-        currNode.meta = { output }; // set value of output in meta object of node for later access
+        currNode.meta = { data_output: output }; // set value of output in meta object of node for later access
         const connections = this.editor?.view.connections;
         const nodeConnections = currNode?.getConnections() ?? [];
         this.store.dispatch(new AppActions.UpdateConnectionStroke(connections, nodeConnections));

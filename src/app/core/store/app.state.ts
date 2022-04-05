@@ -17,15 +17,17 @@ export class AppState {
         const conData = connections?.get(con);
         if (conData) {
           const { el } = conData;
+          const elClassList = el.children[0].classList;
           const path = el.querySelector('path');
-          // console.log(conData.outputNode.node);
           for (let [key, val] of Object.entries(conData.outputNode.node.meta)) {
-            // const output = conData.outputNode.node.meta[key] ?? false;
+            const outputClass = `output-${key.toLowerCase()}`;
             const output = val;
-            if (output) {
-              path?.classList.add('source-true');
-            } else {
-              path?.classList.remove('source-true');
+            if (elClassList.contains(outputClass) || key === 'data_output') {
+              if (output) {
+                path?.classList.add('source-true');
+              } else {
+                path?.classList.remove('source-true');
+              }
             }
           }
         }

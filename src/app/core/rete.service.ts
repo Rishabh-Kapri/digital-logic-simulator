@@ -38,7 +38,6 @@ export class ReteService {
   constructor(private store: Store) {}
 
   initRete(container: HTMLElement): void {
-    console.log(this.store);
     this.editor = new NodeEditor('node-editor@0.1.0', container);
     this.engine = new Engine('node-editor@0.1.0');
 
@@ -70,7 +69,6 @@ export class ReteService {
     this.addReteListeners();
     this.editor.view.resize();
     const { area } = this.editor.view;
-    console.log(area);
     this.editor.trigger('process');
   }
 
@@ -217,13 +215,11 @@ export class ReteService {
       switch (nodeType) {
         case 'Source': {
           const key = `${nodeData.name}-${nodeData.data['id']}`;
-          console.log('Source:', key);
           circuitNode.addInput(new Input(key, key, ioSocket));
           break;
         }
         case 'Sink': {
           const key = `${nodeData.name}-${nodeData.data['id']}`;
-          console.log('Sink:', key);
           circuitNode.addOutput(new Output(key, key, ioSocket));
           break;
         }
@@ -234,7 +230,6 @@ export class ReteService {
           // @TODO
           // 1. add comments
           // 2. handle custom circuit not present
-          console.log('Custom node found');
           const name = <string>nodeData.data['circuitName'];
           customCircuits.push(name);
           break;
